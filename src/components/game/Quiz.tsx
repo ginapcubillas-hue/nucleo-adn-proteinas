@@ -25,6 +25,14 @@ function shuffleArray<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
+function barajarOpciones(p: Pregunta): Pregunta {
+  if (p.tipo !== 'opcion' || !p.opciones || p.correcta === undefined) return p;
+  const textoCorrecto = p.opciones[p.correcta as number];
+  const opcionesBarajadas = shuffleArray(p.opciones);
+  const nuevaCorrecta = opcionesBarajadas.indexOf(textoCorrecto);
+  return { ...p, opciones: opcionesBarajadas, correcta: nuevaCorrecta };
+}
+
 export function Quiz({ nivel, onCompletar, preguntasFalladasIds }: QuizProps) {
   const {
     vozOn, velocidadVoz, vozURI, reducirAnimaciones, temporizador,
@@ -40,7 +48,7 @@ export function Quiz({ nivel, onCompletar, preguntasFalladasIds }: QuizProps) {
     preguntasIniciales = getPreguntasPorNivelMixtas(nivel, 10);
   }
 
-  const [preguntas] = useState<Pregunta[]>(preguntasIniciales);
+  const [preguntas] = useState<Pregunta[]>(() => preguntasIniciales.map(barajarOpciones));
   const [indiceActual, setIndiceActual] = useState(0);
   const [aciertos, setAciertos] = useState(0);
   const [respondido, setRespondido] = useState(false);
